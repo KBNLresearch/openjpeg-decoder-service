@@ -1,0 +1,43 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 9080
+  adminConnectors:
+    - type: http
+      port: 9081
+  requestLog:
+    appenders:
+      - type: console
+
+logging:
+  appenders:
+    - type: console
+  level: INFO
+
+decodedImageCache:
+  maxEntries: 500
+  expireAfterAccessMinutes: 60
+
+responseImageCache:
+  maxEntries: 2000
+  expireAfterAccessMinutes: 10
+
+numThreads: 4
+threadPool: 8
+
+imageFetcher:
+  type: http
+  resolveFormat: "http://resolver.kb.nl/resolve?urn=%s"
+  fileCacher:
+    dir: "./cache"
+    expireMinutes: 600000
+    maxSizeMB: 1024
+  httpClient:
+    timeout: 5000ms
+    connectionTimeout: 5000ms
+    timeToLive: 1h
+    cookiesEnabled: false
+    maxConnections: 1024
+    maxConnectionsPerRoute: 1024
+    keepAlive: 0ms
+    retries: 3
