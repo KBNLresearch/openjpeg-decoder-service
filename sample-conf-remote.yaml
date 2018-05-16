@@ -27,7 +27,7 @@ threadPool: 8
 
 imageFetcher:
   type: http
-  resolveFormat: "https://cdn.rawgit.com/KBNLresearch/openjpeg-decoder-service/master/src/test/resources/%s"
+  resolveFormat: "https://cdn.rawgit.com/KBNLresearch/openjpeg-decoder-service/48af44cb/src/test/resources/%s"
   fileCacher:
     dir: "./cache"
     expireMinutes: 600000
