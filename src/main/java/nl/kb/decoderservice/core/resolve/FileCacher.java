@@ -54,7 +54,6 @@ class FileCacher {
 
             }
         }
-        System.err.println(filename);
         final File file = new File(String.format("%s/%s", cacheDir, filename));
         if (file.exists()) {
             cacheMap.put(filename, new CacheStats(file.length()));
