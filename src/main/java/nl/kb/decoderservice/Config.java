@@ -22,6 +22,9 @@ class Config extends Configuration {
     @JsonProperty("imageFetcher")
     private ImageFetcherFactory imageFetcherFactory;
 
+    @JsonProperty("allowCorsDomain")
+    private String allowOrigin = null;
+
     int getThreadPoolSize() {
         return threadPoolSize;
     }
@@ -44,5 +47,9 @@ class Config extends Configuration {
 
     public ImageFetcherFactory getImageFetcherFactory() {
         return imageFetcherFactory;
+    }
+
+    public String getAllowOrigin() {
+        return allowOrigin;
     }
 }

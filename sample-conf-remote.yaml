@@ -41,3 +41,5 @@ imageFetcher:
     maxConnectionsPerRoute: 1024
     keepAlive: 0ms
     retries: 3
+
+allowCorsDomain: "http://kbresearch.nl"

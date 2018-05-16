@@ -28,10 +28,12 @@ public class IIIFServiceResource extends ImageResource {
     private static final Logger LOG = LoggerFactory.getLogger(IIIFServiceResource.class);
 
     private final ImageFetcher imageFetcher;
+    private final String allowOrigin;
 
-    public IIIFServiceResource(ImageFetcher imageFetcher, ImageDecoder imageDecoder, CacheConfig cacheConfig) {
+    public IIIFServiceResource(ImageFetcher imageFetcher, ImageDecoder imageDecoder, CacheConfig cacheConfig, String allowOrigin) {
         super(imageDecoder, cacheConfig);
         this.imageFetcher = imageFetcher;
+        this.allowOrigin = allowOrigin;
     }
 
     @GET
@@ -49,9 +51,13 @@ public class IIIFServiceResource extends ImageResource {
             final File cached = imageFetcher.fetch(identifier);
             final Jp2Header jp2Header = Jp2Header.read(cached);
 
-            return Response
-                    .ok(new ImageInfo(jp2Header, uriInfo))
-                    .build();
+            final Response.ResponseBuilder responseBuilder = Response.ok(new ImageInfo(jp2Header, uriInfo));
+
+            if (allowOrigin != null) {
+                return responseBuilder.header("Access-Control-Allow-Origin", allowOrigin).build();
+            } else {
+                return responseBuilder.build();
+            }
         } catch (FileNotFoundException e) {
             LOG.warn("File not found ", e);
             return Response.status(Response.Status.NOT_FOUND).build();

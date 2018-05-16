@@ -28,3 +28,5 @@ threadPool: 8
 imageFetcher:
   type: file
   resolveFormat: "src/test/resources/%s"
+
+allowCorsDomain: "*"
