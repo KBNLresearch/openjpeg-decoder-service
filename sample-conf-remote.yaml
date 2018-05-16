@@ -42,4 +42,4 @@ imageFetcher:
     keepAlive: 0ms
     retries: 3
 
-allowCorsDomain: "http://kbresearch.nl"
+allowCorsDomain: "*"
