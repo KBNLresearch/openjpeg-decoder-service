@@ -6,7 +6,7 @@
 
     <groupId>nl.kb.research</groupId>
     <artifactId>openjpeg-decoder-service</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
     <properties>
         <jdk.version>1.8</jdk.version>
