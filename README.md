@@ -7,13 +7,6 @@ This service uses [openjpeg 2.3](https://github.com/uclouvain/openjpeg) for deco
 It intends to be compliant to the [IIIF image API 2.1](http://iiif.io/api/image/2.1/).
 
 
-## Online demo
-
-Online viewer using leaflet see: [here](http://kbresearch.nl/imageviewer-demos/openjpeg-decoder-demo.html?id=iceland.jp2) and [here](http://kbresearch.nl/imageviewer-demos/openjpeg-decoder-demo.html)
-
-Service location for online demo:  [here](http://openjpeg-decoder-service.kbresearch.nl/iiif-service/iceland.jp2/full/pct:10/0/default.jpg)
-
-
 ## Quick start using docker
 
 To try out the service locally you can download a sample .jp2 and run the following commands
@@ -41,7 +34,7 @@ sudo apt-get install git-core cmake g++ maven
 
 git clone https://github.com/uclouvain/openjpeg.git
 cd openjpeg
-git checkout tags/v2.3.0
+git checkout tags/v2.3.1
 
 cmake . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:bool=on -DCMAKE_CXX_COMPILER=/usr/bin/cc
 make
@@ -49,7 +42,7 @@ sudo make install
 sudo ldconfig
 
 cd /path/to/openjpeg-decoder-service
-mvn clean package
+JAVA_HOME=/path/to/java-8-jdk mvn clean package
 
 java -jar target/openjpeg-decoder-service-1.1-SNAPSHOT.jar server sample-conf.yaml
 ```

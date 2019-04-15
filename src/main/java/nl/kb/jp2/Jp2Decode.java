@@ -16,7 +16,7 @@ public class Jp2Decode {
             Jp2Header jp2Header, int x, int y, int w, int h, int cp_reduce, int numThreads, ExecutorService executorService) throws IOException, InterruptedException, ExecutionException {
         final List<DecodedImage> result = new ArrayList<>();
 
-        if (numThreads > 1 && h > numThreads) {
+        if (numThreads > 1 && h > numThreads && DimReducer.reduce(w, cp_reduce) * DimReducer.reduce(h, cp_reduce) > 500_000) {
             final List<Callable<DecodedImage>> callables = new ArrayList<>();
 
             final int divH = (int) Math.ceil(h / numThreads);
@@ -48,7 +48,6 @@ public class Jp2Decode {
         }
 
         final DecodedImageDims decodedImageDims = decodeJp2Area(jp2Header.getFileName(), x, y, w, h, cp_reduce, colorBands);
-
         return new DecodedImage(decodedImageDims, colorBands);
     }
 

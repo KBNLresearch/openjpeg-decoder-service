@@ -7,6 +7,7 @@ import nl.kb.decoderservice.api.ScaleDims;
 import nl.kb.decoderservice.core.ImageDecoder;
 import nl.kb.decoderservice.core.resolve.ImageFetcher;
 import nl.kb.jp2.Jp2Header;
+import org.eclipse.jetty.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 
 @Path("/iiif-service/{identifier}")
@@ -46,7 +47,7 @@ public class IIIFServiceResource extends ImageResource {
     @GET
     @Path("/info.json")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response info(@Context UriInfo uriInfo, @PathParam("identifier") String identifier) {
+    public Response info(@Context UriInfo uriInfo, @PathParam("identifier") String identifier) throws IOException {
         try {
             final File cached = imageFetcher.fetch(identifier);
             final Jp2Header jp2Header = Jp2Header.read(cached);
@@ -58,7 +59,7 @@ public class IIIFServiceResource extends ImageResource {
             } else {
                 return responseBuilder.build();
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             LOG.warn("File not found ", e);
             return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
@@ -82,10 +83,7 @@ public class IIIFServiceResource extends ImageResource {
             final ScaleDims scaleDims = ScaleDims.parseAndDetermine(sizeParam, region);
             final int deg = rotation.matches("^(90|180|270)$") ? Integer.parseInt(rotation) : 0;
 
-            return getJpegResponse(jp2Header, region, scaleDims, deg);
-        } catch (FileNotFoundException e) {
-            LOG.warn("File not found ", e);
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return getJpegResponse(jp2Header, region, scaleDims, deg, 1f);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

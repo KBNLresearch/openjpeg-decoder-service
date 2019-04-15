@@ -6,7 +6,7 @@
 
     <groupId>nl.kb.research</groupId>
     <artifactId>openjpeg-decoder-service</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
 
     <properties>
         <jdk.version>1.8</jdk.version>
@@ -126,7 +126,6 @@
                                         dir="${project.basedir}"
                                         executable="${project.basedir}/src/main/native/compile.sh"
                                         failonerror="true">
-                                    <arg line="${openjpeg.version}" />
                                 </exec>
 
                             </tasks>

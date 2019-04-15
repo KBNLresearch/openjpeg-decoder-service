@@ -49,30 +49,30 @@ public class BufferedImageWriter {
         }
         executorService.invokeAll(callables);
 
-
-
-
         if (deg == 0 || deg == 180) {
-            final BufferedImage inImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-            inImage.setRGB(0, 0, width, height, remapped, 0, width);
-
+            final BufferedImage inImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            inImage.getRaster().setDataElements(0,0, width, height, remapped);
             if (width == newWidth && height == newHeight) {
                 return inImage;
             }
 
             final ResampleOp resizeOp = new ResampleOp(newWidth, newHeight);
             resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
+
             return resizeOp.filter(inImage, null);
         } else {
-            final BufferedImage inImage = new BufferedImage(height, width, BufferedImage.TYPE_3BYTE_BGR);
-            inImage.setRGB(0, 0, height, width, remapped, 0, height);
+            final BufferedImage inImage = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
+            inImage.getRaster().setDataElements(0,0, height, width, remapped);
+
 
             if (width == newWidth && height == newHeight) {
+
                 return inImage;
             }
 
             final ResampleOp resizeOp = new ResampleOp(newHeight, newWidth);
             resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
+
             return resizeOp.filter(inImage, null);
         }
     }

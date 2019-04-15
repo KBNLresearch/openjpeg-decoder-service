@@ -5,6 +5,7 @@ import io.dropwizard.setup.Environment;
 import nl.kb.decoderservice.core.ImageDecoder;
 import nl.kb.decoderservice.core.resolve.ImageFetcher;
 import nl.kb.decoderservice.resources.IIIFServiceResource;
+import nl.kb.decoderservice.resources.ImagingServiceResource;
 import nl.kb.utils.NativeUtils;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class Main extends Application<Config> {
         final ExecutorService executorService = Executors.newFixedThreadPool(config.getThreadPoolSize());
         final ImageDecoder imageDecoder = new ImageDecoder(executorService, config.getNumThreads(), config.getDecodedImageCache());
 
+        environment.jersey().register(new ImagingServiceResource(imageFetcher, imageDecoder, config.getResponseImageCache()));
         environment.jersey().register(new IIIFServiceResource(imageFetcher, imageDecoder, config.getResponseImageCache(), config.getAllowOrigin()));
 
     }

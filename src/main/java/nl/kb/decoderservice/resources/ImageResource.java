@@ -40,7 +40,7 @@ class ImageResource extends CacheLoader<ParameterCompound, BufferedImage> {
                 .build(this);
     }
 
-    Response getJpegResponse(Jp2Header jp2Header, Region region, ScaleDims scaleDims, int deg) throws ExecutionException {
+    Response getJpegResponse(Jp2Header jp2Header, Region region, ScaleDims scaleDims, int deg, float quality) throws IOException, ExecutionException, InterruptedException {
 
         if (!region.isValid() || !scaleDims.isValid()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -63,7 +63,7 @@ class ImageResource extends CacheLoader<ParameterCompound, BufferedImage> {
         final ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
 
         jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        jpegParams.setCompressionQuality((float) 1.0);
+        jpegParams.setCompressionQuality(quality);
 
 
         final StreamingOutput stream = os -> {
