@@ -44,7 +44,7 @@ sudo ldconfig
 cd /path/to/openjpeg-decoder-service
 JAVA_HOME=/path/to/java-8-jdk mvn clean package
 
-java -jar target/openjpeg-decoder-service-1.1-SNAPSHOT.jar server sample-conf.yaml
+java -jar target/openjpeg-decoder-service-1.2.jar server sample-conf.yaml
 ```
 
 Then visit: [http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg](http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg)
