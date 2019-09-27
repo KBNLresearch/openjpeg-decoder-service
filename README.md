@@ -4,7 +4,7 @@ A proof-of-concept java based jp2 decoder service.
 
 This service uses [openjpeg 2.3](https://github.com/uclouvain/openjpeg) for decoding.
 
-It intends to be compliant to the [IIIF image API 2.1](http://iiif.io/api/image/2.1/).
+It intends to be compliant to the [IIIF image API 2.1](http://iiif.io/api/image/2.1/), level 1.
 
 
 ## Quick start using docker
