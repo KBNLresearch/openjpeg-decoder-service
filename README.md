@@ -1,6 +1,6 @@
 # openjpeg-decoder-service
 
-A proof-of-concept java based jp2 decoder service.
+A java based jp2 decoder service.
 
 This service uses [openjpeg 2.3](https://github.com/uclouvain/openjpeg) for decoding.
 
