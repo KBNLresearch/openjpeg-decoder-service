@@ -2,9 +2,6 @@ server:
   applicationConnectors:
     - type: http
       port: 9080
-  adminConnectors:
-    - type: http
-      port: 9081
   requestLog:
     appenders:
       - type: console
@@ -22,11 +19,7 @@ responseImageCache:
   maxEntries: 2000
   expireAfterAccessMinutes: 10
 
-numThreads: 4
+numThreads: 2
 threadPool: 8
 
-imageFetcher:
-  type: file
-  resolveFormat: "/mount/%s"
-
-allowCorsDomain: "*"
+mountPoint: "/mount"

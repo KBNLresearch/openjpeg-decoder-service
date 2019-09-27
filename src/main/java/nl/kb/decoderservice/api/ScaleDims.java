@@ -47,8 +47,10 @@ public class ScaleDims {
             final int h = Integer.parseInt(sizeParam.replaceAll(",", ""));
             final int w = (int) Math.ceil(((double) h / (double) region.getH()) * region.getW());
             return new ScaleDims(w, h);
-        } else /* sizeParam = full or max*/ {
+        } else if (sizeParam.equals("full") || sizeParam.equals("max")) {
           return new ScaleDims(region.getW(), region.getH());
+        } else {
+            throw new IllegalArgumentException("Bad format for size requested");
         }
     }
 

@@ -52,8 +52,10 @@ public class Region {
                     Integer.parseInt(dims[2]),
                     Integer.parseInt(dims[3]));
 
-        } else /* if raw.equals("full") */{
+        } else if (raw.equals("full") || raw.equals("max")) {
             return new Region(0,0, imgW, imgH);
+        } else {
+            throw new IllegalArgumentException("Bad format for region parameter");
         }
     }
 

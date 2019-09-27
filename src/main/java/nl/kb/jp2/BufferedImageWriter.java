@@ -3,6 +3,7 @@ package nl.kb.jp2;
 import com.mortennobel.imagescaling.ResampleFilters;
 import com.mortennobel.imagescaling.ResampleOp;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +57,14 @@ public class BufferedImageWriter {
                 return inImage;
             }
 
-            final ResampleOp resizeOp = new ResampleOp(newWidth, newHeight);
-            resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
+            if (newWidth > 2 && newHeight > 2) {
+                final ResampleOp resizeOp = new ResampleOp(newWidth, newHeight);
+                resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
 
-            return resizeOp.filter(inImage, null);
+                return resizeOp.filter(inImage, null);
+            } else {
+                return getScaledImageAWT(newWidth, newHeight, inImage);
+            }
         } else {
             final BufferedImage inImage = new BufferedImage(height, width, BufferedImage.TYPE_INT_RGB);
             inImage.getRaster().setDataElements(0,0, height, width, remapped);
@@ -70,11 +75,23 @@ public class BufferedImageWriter {
                 return inImage;
             }
 
-            final ResampleOp resizeOp = new ResampleOp(newHeight, newWidth);
-            resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
-
-            return resizeOp.filter(inImage, null);
+            if (newWidth > 2 && newHeight > 2) {
+                final ResampleOp resizeOp = new ResampleOp(newHeight, newWidth);
+                resizeOp.setFilter(ResampleFilters.getLanczos3Filter());
+                return resizeOp.filter(inImage, null);
+            } else {
+                return getScaledImageAWT(newHeight, newWidth, inImage);
+            }
         }
+    }
+
+    private static BufferedImage getScaledImageAWT(int newWidth, int newHeight, BufferedImage inImage) {
+        final Image scaledInstance = inImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        final BufferedImage outImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        final Graphics2D graphics = outImage.createGraphics();
+        graphics.drawImage(scaledInstance, 0, 0, null);
+        graphics.dispose();
+        return outImage;
     }
 
 }

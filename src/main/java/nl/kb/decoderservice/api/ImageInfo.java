@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ImageInfo {
 
-    @JsonProperty("@protocol")
+    @JsonProperty("protocol")
     private final String protocol = "http://iiif.io/api/image";
     @JsonProperty("@context")
     private final String context = "http://iiif.io/api/image/2/context.json";

@@ -4,7 +4,7 @@ import nl.kb.decoderservice.CacheConfig;
 import nl.kb.decoderservice.api.Region;
 import nl.kb.decoderservice.api.ScaleDims;
 import nl.kb.decoderservice.core.ImageDecoder;
-import nl.kb.decoderservice.core.resolve.ImageFetcher;
+import nl.kb.decoderservice.core.ImageFetcher;
 import nl.kb.jp2.Jp2Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +49,14 @@ public class ImagingServiceResource extends ImageResource {
             final Region region = new Region(jp2Header);
 
             if (cParam != null && cParam.equals("imghead")) {
-                return metadataResponse(jp2Header);
+                return metadataResponse(jp2Header, fParam);
             }
 
             interpretParams(scaleDims, region,
                     xParam == null ? null : (int) Math.round(xParam),
                     yParam == null ? null : (int) Math.round(yParam),
-                    wParam == null ? null : (int) Math.round(wParam),
-                    hParam == null ? null : (int) Math.round(hParam),
+                    (wParam == null || wParam == 0) ? null : (int) Math.round(wParam),
+                    (hParam == null || hParam == 0) ? null : (int) Math.round(hParam),
                     sParam,
                     rParam == null ? null : rParam.intValue(),
                     jp2Header);
@@ -72,17 +72,17 @@ public class ImagingServiceResource extends ImageResource {
         }
     }
 
-    private Response metadataResponse(Jp2Header jp2Header) {
-        return Response.ok(
-                String.format("width: %d\n" +
-                        "height: %d\n" +
-                        "levels: %d\n" +
-                        "tilex: 0\n" +
-                        "tiley: 0\n" +
-                        "tilewidth: %d\n" +
-                        "tileheight: %d\n" +
-                        "colorspace: %s\n", jp2Header.getX1(), jp2Header.getY1(), jp2Header.getNumRes() - 1, jp2Header.getTdx(), jp2Header.getTdy(), jp2Header.getColorSpace()
-                )).header("Content-type", "text/plain; charset=utf-8").build();
+    private Response metadataResponse(Jp2Header jp2Header, String fParam) throws Exception {
+            return Response.ok(
+                    String.format("width: %d\n" +
+                            "height: %d\n" +
+                            "levels: %d\n" +
+                            "tilex: 0\n" +
+                            "tiley: 0\n" +
+                            "tilewidth: %d\n" +
+                            "tileheight: %d\n" +
+                            "colorspace: %s\n", jp2Header.getX1(), jp2Header.getY1(), jp2Header.getNumRes() - 1, jp2Header.getTdx(), jp2Header.getTdy(), jp2Header.getColorSpace()
+                    )).header("Content-type", "text/plain; charset=utf-8").build();
     }
 
     private void interpretParams(ScaleDims scaleDims, Region region,
@@ -92,59 +92,73 @@ public class ImagingServiceResource extends ImageResource {
         if (xParam == null && yParam == null && sParam == null) {
             interpretFullRegionParams(scaleDims, wParam, hParam, rParam == null ? 0 : rParam, jp2Header);
         } else {
+            // Applies default values to client GET parameters, fixes negative values
             rParam = rParam == null ? 0 : rParam;
-            sParam = sParam == null ? 1.0 : sParam;
+            sParam = sParam == null || sParam == 0 ? 1.0 : sParam;
             final int requestedX = xParam == null || xParam < 0 ? 0 : xParam;
             final int requestedY = yParam == null || yParam < 0 ? 0 : yParam;
             final int requestedW = wParam == null ? (int) Math.round(jp2Header.getX1() * sParam) : wParam;
             final int requestedH = hParam == null ? (int) Math.round(jp2Header.getY1() * sParam) : hParam;
 
-            final Region rotatedRegion = new Region(
+            // Determines the region on the the source image the client wants returned
+            final Region regionSelectedOnSourceImage = determineRegionOnSourceImage(
+                    xParam, yParam, wParam, hParam, sParam, rParam, jp2Header,
+                            requestedX, requestedY, requestedW, requestedH);
+
+
+            // Ensures that all positions are with in the full dimensions of the source image
+            int boundedSourceRegionW = Math.min(regionSelectedOnSourceImage.getW(), jp2Header.getX1());
+            int boundedSourceRegionH = Math.min(regionSelectedOnSourceImage.getH(), jp2Header.getY1());
+            int boundedSourceRegionX;
+            int boundedSourceRegionY;
+            if (regionSelectedOnSourceImage.getX() + boundedSourceRegionW > jp2Header.getX1()) {
+                if (jp2Header.getX1() - regionSelectedOnSourceImage.getW() >= 0) {
+                    boundedSourceRegionX = jp2Header.getX1() - regionSelectedOnSourceImage.getW();
+                    boundedSourceRegionW = regionSelectedOnSourceImage.getW();
+                } else {
+                    boundedSourceRegionX = 0;
+                }
+            } else {
+                boundedSourceRegionX = regionSelectedOnSourceImage.getX();
+            }
+            if (regionSelectedOnSourceImage.getY() + boundedSourceRegionH > jp2Header.getY1()) {
+                if (jp2Header.getY1() - regionSelectedOnSourceImage.getH() >= 0) {
+                    boundedSourceRegionY = jp2Header.getY1() - regionSelectedOnSourceImage.getH();
+                    boundedSourceRegionH = regionSelectedOnSourceImage.getH();
+                } else {
+                    boundedSourceRegionY = 0;
+                }
+            } else {
+                boundedSourceRegionY = regionSelectedOnSourceImage.getY();
+            }
+            // end bounds validation
+
+            // Sets the exact dimensions for scaled result image based on the bounded source region
+            scaleDims.setW((int) Math.round(boundedSourceRegionW * sParam));
+            scaleDims.setH((int) Math.round(boundedSourceRegionH * sParam));
+
+            // Copies bounded region into Region class-instance for further processing
+            region.setW(boundedSourceRegionW);
+            region.setH(boundedSourceRegionH);
+            region.setX(boundedSourceRegionX);
+            region.setY(boundedSourceRegionY);
+
+        }
+    }
+
+    private Region determineRegionOnSourceImage(Integer xParam, Integer yParam, Integer wParam, Integer hParam,
+                                                Double sParam, Integer rParam, Jp2Header jp2Header, int requestedX,
+                                                int requestedY, int requestedW, int requestedH) {
+
+        if (wParam == null && hParam == null) {
+            return new Region(0, 0, jp2Header.getX1(), jp2Header.getY1());
+        } else {
+            return new Region(
                     (int) Math.round(requestedX / sParam),
                     (int) Math.round(requestedY / sParam),
-                    (int) (xParam == null && yParam == null && wParam == null && hParam == null ? jp2Header.getX1() : Math.round(requestedW / sParam)),
-                    (int) (xParam == null && yParam == null && wParam == null && hParam == null ? jp2Header.getY1() : Math.round(requestedH / sParam)))
-                    .rotatedForRequest(jp2Header, rParam);
-
-            final int scaledRequestedW = rotatedRegion.getW();
-            final int scaledRequestedH = rotatedRegion.getH();
-            final int requestedRegionX = rotatedRegion.getX();
-            final int requestedRegionY = rotatedRegion.getY();
-
-            int derivedRegionW = Math.min(scaledRequestedW, jp2Header.getX1());
-            int derivedRegionH = Math.min(scaledRequestedH, jp2Header.getY1());
-            int derivedRegionX;
-            int derivedRegionY;
-
-
-            if (requestedRegionX + derivedRegionW > jp2Header.getX1()) {
-                if (jp2Header.getX1() - scaledRequestedW >= 0) {
-                    derivedRegionX = jp2Header.getX1() - scaledRequestedW;
-                    derivedRegionW = scaledRequestedW;
-                } else {
-                    derivedRegionX = 0;
-                }
-            } else {
-                derivedRegionX = requestedRegionX;
-            }
-
-            if (requestedRegionY + derivedRegionH > jp2Header.getY1()) {
-                if (jp2Header.getY1() - scaledRequestedH >= 0) {
-                    derivedRegionY = jp2Header.getY1() - scaledRequestedH;
-                    derivedRegionH = scaledRequestedH;
-                } else {
-                    derivedRegionY = 0;
-                }
-            } else {
-                derivedRegionY = requestedRegionY;
-            }
-
-            scaleDims.setW((int) Math.round(derivedRegionW * sParam));
-            scaleDims.setH((int) Math.round(derivedRegionH * sParam));
-            region.setW(derivedRegionW);
-            region.setH(derivedRegionH);
-            region.setX(derivedRegionX);
-            region.setY(derivedRegionY);
+                    (int) Math.round(requestedW / sParam),
+                    (int) Math.round(requestedH / sParam)
+            ).rotatedForRequest(jp2Header, rParam);
         }
     }
 

@@ -5,7 +5,7 @@ import nl.kb.decoderservice.CacheConfig;
 import nl.kb.decoderservice.api.Region;
 import nl.kb.decoderservice.api.ScaleDims;
 import nl.kb.decoderservice.core.ImageDecoder;
-import nl.kb.decoderservice.core.resolve.ImageFetcher;
+import nl.kb.decoderservice.core.ImageFetcher;
 import nl.kb.jp2.Jp2Header;
 import nl.kb.utils.NativeUtils;
 import org.junit.Before;

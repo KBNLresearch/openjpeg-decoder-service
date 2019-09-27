@@ -44,7 +44,7 @@ sudo ldconfig
 cd /path/to/openjpeg-decoder-service
 JAVA_HOME=/path/to/java-8-jdk mvn clean package
 
-java -jar target/openjpeg-decoder-service-1.2.jar server sample-conf.yaml
+java -jar target/openjpeg-decoder-service-2.0.0.jar server sample-conf.yaml
 ```
 
 Then visit: [http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg](http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg)
@@ -53,18 +53,12 @@ to see if it works.
 
 ## Configuration options
 
-In this directory there are some sample yaml (dropwizard) configurations. The service can be configured to decode local
-files: ```sample-conf.yaml```
+In this directory there are some sample yaml (dropwizard) configurations. The service can - without adaptations - only be configured to decode local files: ```sample-conf.yaml```
 
-But also files wich are first downloaded to a cache via URL: ```sample-conf-remote.yaml```
 
-The relevant field to adapt to your environment is: ```resolveFormat```
+Other configurable options involve cache settings and multi-threading options, which should be tweaked by you on your own environment.
 
-Other configurable options involve cache settings and multi-threading options, which should be tweaked by you on your own
-environment.
-
-When experimenting with this service in a productive environment it is essential to check out a stable (tagged) version
-and assign enough memory, for instance:
+When experimenting with this service in a productive environment it is essential to check out a stable (tagged) version and assign enough memory, for instance:
 ```
-java -Xms2g -Xmx8g -jar target/openjpeg-decoder-service-1.0.jar server sample-conf.yaml
+java -Xms2g -Xmx8g -jar target/openjpeg-decoder-service-2.0.0.jar server sample-conf.yaml
 ```

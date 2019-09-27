@@ -14,7 +14,7 @@ RUN make install
 RUN make clean
 RUN ldconfig
 
-COPY target/openjpeg-decoder-service-1.1.jar /
+COPY target/openjpeg-decoder-service-2.0.0.jar /
 COPY sample-conf.yaml /
 
 RUN mkdir "/service"
@@ -23,4 +23,4 @@ COPY . /service
 WORKDIR "/service"
 RUN mvn clean package
 
-CMD java -jar target/openjpeg-decoder-service-1.1.jar server docker-conf.yaml
+CMD java -jar target/openjpeg-decoder-service-2.0.0.jar server docker-conf.yaml
