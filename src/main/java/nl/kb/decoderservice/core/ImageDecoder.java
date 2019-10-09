@@ -51,36 +51,4 @@ public class ImageDecoder extends CacheLoader<ParameterCompound, List<DecodedIma
                 key.getRegion().getH(),
                 key.getCp_reduce(), numThreads, executorService);
     }
-
-
-    /*
-        private static void testRun(File file) throws IOException {
-        final int cp_reduce = 0;
-        try (final FileInputStream fis = new FileInputStream(file); final ImageInputStream ims = ImageIO.createImageInputStream(fis)) {
-            final Iterator<ImageReader> imageReaders = ImageIO.getImageReadersByFormatName("JPEG2000");
-            if (imageReaders.hasNext()) {
-                final ImageReader reader = imageReaders.next();
-
-                reader.setInput(ims);
-                final ImageReadParam imageReadParam = new ImageReadParam();
-                final Rectangle rectangle = new Rectangle();
-                rectangle.width = 100;
-                rectangle.height = 100;
-                rectangle.x = 10;
-                rectangle.y = 10;
-                imageReadParam.setSourceRegion(rectangle);
-
-                final BufferedImage img = reader.read(3, imageReadParam);
-                ImageIO.write(img, "jpg", new File("output/" +
-                        file.getName()
-                                .replaceAll("\\..*", "") + "-" + cp_reduce +".jpg"));
-
-                reader.dispose();
-
-            } else {
-                throw new IllegalStateException("this should not happen");
-            }
-        }
-    }
-     */
 }
