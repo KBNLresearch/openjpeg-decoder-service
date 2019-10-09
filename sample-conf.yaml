@@ -12,11 +12,11 @@ logging:
   level: INFO
 
 decodedImageCache:
-  maxEntries: 500
+  maxEntries: 0
   expireAfterAccessMinutes: 60
 
 responseImageCache:
-  maxEntries: 2000
+  maxEntries: 0
   expireAfterAccessMinutes: 10
 
 numThreads: 2

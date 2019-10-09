@@ -14,13 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main extends Application<Config> {
-    static {
-        try {
-            NativeUtils.loadLibraryFromJar("/native/libjp2j.so");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static void main(String... args) throws Exception {
         new Main().run(args);

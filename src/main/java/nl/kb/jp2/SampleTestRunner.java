@@ -20,13 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SampleTestRunner {
-    static {
-        try {
-            NativeUtils.loadLibraryFromJar("/native/libjp2j.so");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static void main(String... args) {
         final File[] aFiles = new File(args[0]).listFiles();

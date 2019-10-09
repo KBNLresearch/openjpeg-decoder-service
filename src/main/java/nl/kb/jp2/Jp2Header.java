@@ -12,8 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Jp2Header {
-    private static final OpenJpeg openJpeg = new OpenJpeg();
-    private Object scaleFactors;
+    private static final OpenJpeg openJpeg = OpenJpegJnr.getOpenJpeg();
 
     private Jp2Header() { }
     private int x1;

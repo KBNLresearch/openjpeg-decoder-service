@@ -37,13 +37,7 @@ public class ImagingServiceResourceTest {
     private static final ImageFetcher imageFetcher = mock(ImageFetcher.class);
     private static final CacheConfig cacheConfig = new CacheConfig(0, 0);
     private static final ImageDecoder imageDecoder = new ImageDecoder(executorService, 2, cacheConfig);
-    static {
-        try {
-            NativeUtils.loadLibraryFromJar("/native/libjp2j.so");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     @ClassRule
     public static final ResourceTestRule resourceUnderTest = ResourceTestRule.builder()
