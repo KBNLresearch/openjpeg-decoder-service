@@ -100,6 +100,10 @@ public class Jp2Decode {
         }
     }
 
+    private static native DecodedImageDims decodeJp2Area(String filename,
+                                             int x, int y, int w, int h, int cp_reduce,
+                                             int[][] colorBands) throws IOException;
+
 
 
     private static opj_image getImage(InStreamWrapper wrapper, Pointer codec) throws IOException {
@@ -161,10 +165,9 @@ public class Jp2Decode {
 
             for (int j = 0; j < numcomps; j++) {
                 final Pointer pBand = comps[j].data.get();
-
-                //*env)->SetIntArrayRegion(env, band, 0, resources.image->comps[i].w * resources.image->comps[i].h,
-                //                    resources.image->comps[i].data);
-                pBand.get(0l, colorBands[j], 0, targetWidth * targetHeight);
+                for (int i = 0; i < targetWidth * targetHeight; i++) {
+                    colorBands[j][i] = pBand.getInt(i * 4 /* hoping this is sizeof(int) ? */);
+                }
             }
             return decodedImageDims;
         } finally {
