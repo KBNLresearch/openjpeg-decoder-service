@@ -1,12 +1,18 @@
 package nl.kb.jp2;
 
 import com.google.common.base.Objects;
+import de.digitalcollections.openjpeg.Info;
+import de.digitalcollections.openjpeg.OpenJpeg;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Jp2Header {
+    private static final OpenJpeg openJpeg = new OpenJpeg();
     private Object scaleFactors;
 
     private Jp2Header() { }
@@ -108,7 +114,7 @@ public class Jp2Header {
 
     public static Jp2Header read(File file) throws FileNotFoundException {
         try {
-            final Jp2Header jp2Header = fromFile(file.getAbsolutePath());
+            final Jp2Header jp2Header = fromStream(file.getAbsolutePath());
             jp2Header.setFileName(file.getAbsolutePath());
             return jp2Header;
         } catch (IOException e) {
@@ -116,7 +122,26 @@ public class Jp2Header {
         }
     }
 
-    private static native Jp2Header fromFile(String filename) throws IOException;
+    private static Jp2Header fromStream(String fileName) throws IOException {
+        try (final FileInputStream fis = new FileInputStream(fileName); 
+             final ImageInputStream ims = ImageIO.createImageInputStream(fis)) {
+            final Info openJpegInfo = openJpeg.getInfo(new ImageInputStreamWrapper(ims, openJpeg));
+            return fromInfo(openJpegInfo);
+        }
+    }
+
+    private static Jp2Header fromInfo(Info openJpegInfo) {
+        final Jp2Header jp2Header = new Jp2Header();
+        jp2Header.x1 = openJpegInfo.getNativeSize().width;
+        jp2Header.y1 = openJpegInfo.getNativeSize().height;
+        jp2Header.tw = openJpegInfo.getNumTilesX();
+        jp2Header.th = openJpegInfo.getNumTilesY();
+        jp2Header.tdx = openJpegInfo.getTileSize().width;
+        jp2Header.tdy = openJpegInfo.getTileSize().height;
+        jp2Header.numRes = openJpegInfo.getNumResolutions();
+        jp2Header.numComps = openJpegInfo.getNumComponents();
+        return jp2Header;
+    }
 
     public String getColorSpace() {
         return numComps > 1 ? "RGB" : "GrayScale";
