@@ -20,8 +20,11 @@ public class SampleTestRunner {
 
         for (File file : files) {
             if (file.isFile()) {
+                int warmups = 3;
                 try {
-                    testRun(file);
+                    for (int i = 0; i < warmups; i++) {
+                        testRun(file);
+                    }
                 } catch (IOException | InterruptedException | ExecutionException e) {
                     System.err.println("Failed to decode file " + file.getAbsolutePath());
                     e.printStackTrace();

@@ -40,7 +40,7 @@ public class Jp2Decode {
     private Jp2Decode() { }
 
     private static void setupLogger(Pointer codec) {
-        if (LOG.isInfoEnabled()) {
+/*        if (LOG.isInfoEnabled()) {
             if (!lib.opj_set_info_handler(codec, infoLogFn)) {
                 throw new RuntimeException("Could not set info logging handler");
             }
@@ -54,7 +54,7 @@ public class Jp2Decode {
             if (!lib.opj_set_error_handler(codec, errorLogFn)) {
                 throw new RuntimeException("Could not set error logging handler");
             }
-        }
+        }*/
     }
 
     public static List<DecodedImage> mtDecodeArea(
@@ -92,24 +92,15 @@ public class Jp2Decode {
             colorBands[i] = new int[size];
         }
 
-        try (final FileInputStream fis = new FileInputStream(jp2Header.getFileName());
-             final ImageInputStream ims = ImageIO.createImageInputStream(fis)) {
-            final DecodedImageDims decodedImageDims = decode(new ImageInputStreamWrapper(ims, openJpeg),
-                    new Rectangle(x, y, w, h), cp_reduce, colorBands);
-            return new DecodedImage(decodedImageDims, colorBands);
-        }
+        final DecodedImageDims decodedImageDims = decode(jp2Header.getFileName(),
+                new Rectangle(x, y, w, h), cp_reduce, colorBands);
+        return new DecodedImage(decodedImageDims, colorBands);
     }
 
-    private static native DecodedImageDims decodeJp2Area(String filename,
-                                             int x, int y, int w, int h, int cp_reduce,
-                                             int[][] colorBands) throws IOException;
-
-
-
-    private static opj_image getImage(InStreamWrapper wrapper, Pointer codec) throws IOException {
+    private static opj_image getImage(Pointer defaultFileStream, Pointer codec) throws IOException {
         opj_image img = new opj_image(Runtime.getRuntime(lib));
         PointerByReference imgPtr = new PointerByReference();
-        if (!lib.opj_read_header(wrapper.getNativeStream(), codec, imgPtr)) {
+        if (!lib.opj_read_header(defaultFileStream, codec, imgPtr)) {
             throw new IOException("Error while reading header.");
         }
         img.useMemory(imgPtr.getValue());
@@ -128,13 +119,16 @@ public class Jp2Decode {
         return codec;
     }
 
-    private static  DecodedImageDims decode(InStreamWrapper wrapper, Rectangle area, int reduceFactor, int[][] colorBands)
+    private static  DecodedImageDims decode(String filename, Rectangle area, int reduceFactor, int[][] colorBands)
             throws IOException {
         Pointer codec = null;
         opj_image img = null;
+        Pointer defaultFileStream = null;
         try {
+
             codec = getCodec(reduceFactor);
-            img = getImage(wrapper, codec);
+            defaultFileStream = lib.opj_stream_create_default_file_stream(filename, true);
+            img = getImage(defaultFileStream, codec);
 
             // Configure decoding area
             int targetWidth;
@@ -150,7 +144,7 @@ public class Jp2Decode {
                         area.x, area.y, area.x + area.width, area.y + area.height);
             }
 
-            if (!lib.opj_decode(codec, wrapper.getNativeStream(), Struct.getMemory(img))) {
+            if (!lib.opj_decode(codec, defaultFileStream, Struct.getMemory(img))) {
                 throw new IOException("Could not decode image!");
             }
 
@@ -177,7 +171,9 @@ public class Jp2Decode {
             if (codec != null) {
                 lib.opj_destroy_codec(codec);
             }
-            wrapper.close();
+            if (defaultFileStream != null) {
+                lib.opj_stream_destroy(defaultFileStream);
+            }
         }
 
     }
