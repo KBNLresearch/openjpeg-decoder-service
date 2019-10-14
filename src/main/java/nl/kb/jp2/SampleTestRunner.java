@@ -14,6 +14,15 @@ import java.util.concurrent.Executors;
 public class SampleTestRunner {
 
     public static void main(String... args) {
+        final org.slf4j.Logger logger =
+                org.slf4j.LoggerFactory.getLogger(OpenJpegJnr.class);
+        if (!(logger instanceof ch.qos.logback.classic.Logger)) {
+            return;
+        }
+        ch.qos.logback.classic.Logger logbackLogger =
+                (ch.qos.logback.classic.Logger) logger;
+        logbackLogger.setLevel(ch.qos.logback.classic.Level.ERROR);
+
         final File[] aFiles = new File(args[0]).listFiles();
         final List<File> files = Arrays.asList(aFiles != null ? aFiles : new File[0]);
         files.sort(Comparator.comparing(File::getAbsolutePath));

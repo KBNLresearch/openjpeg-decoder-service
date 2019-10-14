@@ -144,9 +144,7 @@ class OpenJpegJnr {
 
             for (int j = 0; j < numcomps; j++) {
                 final Pointer pBand = comps[j].data.get();
-                for (int i = 0; i < targetWidth * targetHeight; i++) {
-                    colorBands[j][i] = pBand.getInt(i * 4 /* hoping this is sizeof(int) ? */);
-                }
+                pBand.get(0l, colorBands[j], 0, targetWidth * targetHeight);
             }
             return decodedImageDims;
         } finally {
