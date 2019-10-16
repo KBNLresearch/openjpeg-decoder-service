@@ -44,7 +44,7 @@ sudo ldconfig
 cd /path/to/openjpeg-decoder-service
 JAVA_HOME=/path/to/java-8-jdk mvn clean package
 
-java -jar target/openjpeg-decoder-service-2.0.0.jar server sample-conf.yaml
+java -jar target/openjpeg-decoder-service-2.0.1.jar server sample-conf.yaml
 ```
 
 Then visit: [http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg](http://localhost:9080/iiif-service/balloon.jp2/full/pct:25/0/default.jpg)
@@ -60,5 +60,5 @@ Other configurable options involve cache settings and multi-threading options, w
 
 When experimenting with this service in a productive environment it is essential to check out a stable (tagged) version and assign enough memory, for instance:
 ```
-java -Xms2g -Xmx8g -jar target/openjpeg-decoder-service-2.0.0.jar server sample-conf.yaml
+java -Xms2g -Xmx8g -jar target/openjpeg-decoder-service-2.0.1.jar server sample-conf.yaml
 ```
