@@ -22,7 +22,9 @@ import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 @Path("/iiif-service/{identifier}")
 public class IIIFServiceResource extends ImageResource {
@@ -37,8 +39,9 @@ public class IIIFServiceResource extends ImageResource {
 
     @GET
     @Path("/")
-    public Response redirectToInfo(@PathParam("identifier") String identifier) {
-        final URI uri = UriBuilder.fromPath(String.format("/iiif-service/%s/info.json", identifier)).build();
+    public Response redirectToInfo(@PathParam("identifier") String identifier) throws UnsupportedEncodingException {
+        final URI uri = UriBuilder.fromPath(String.format("/iiif-service/%s/info.json",
+                URLEncoder.encode(identifier, "UTF-8"))).build();
         return Response.seeOther(uri).build();
     }
 
