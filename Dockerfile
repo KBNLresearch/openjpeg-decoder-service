@@ -21,4 +21,4 @@ COPY . /service
 WORKDIR "/service"
 RUN mvn clean package
 
-CMD java -jar target/openjpeg-decoder-service-2.0.1.jar server docker-conf.yaml
+CMD java -jar target/openjpeg-decoder-service-2.0.2.jar server docker-conf.yaml

@@ -18,6 +18,9 @@ class Config extends Configuration {
     @JsonProperty
     private CacheConfig responseImageCache = new CacheConfig(2000, 10);
 
+    @JsonProperty("DoSFilter")
+    private DoSFilterConfig doSFilterConfig = new DoSFilterConfig(20, 100);
+
     int getThreadPoolSize() {
         return threadPoolSize;
     }
@@ -36,5 +39,9 @@ class Config extends Configuration {
 
     public CacheConfig getResponseImageCache() {
         return responseImageCache;
+    }
+
+    public DoSFilterConfig getDoSFilterConfig() {
+        return doSFilterConfig;
     }
 }

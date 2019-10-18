@@ -104,11 +104,15 @@ public class Jp2Header {
                 '}';
     }
 
-    public static Jp2Header read(File file) throws FileNotFoundException {
+    public static Jp2Header read(File file) throws IOException {
         try {
             return OpenJpegJnr.getInfo(file.getAbsolutePath());
         } catch (IOException e) {
-            throw new FileNotFoundException("Failed to open file at: " + file.getAbsolutePath());
+            if (!file.exists()) {
+                throw new FileNotFoundException("Failed to open file at: " + file.getAbsolutePath());
+            } else {
+                throw e;
+            }
         }
     }
 
