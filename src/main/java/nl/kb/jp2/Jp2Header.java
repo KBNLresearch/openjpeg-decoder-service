@@ -106,13 +106,17 @@ public class Jp2Header {
                 '}';
     }
 
-    public static Jp2Header read(File file) throws FileNotFoundException {
+    public static Jp2Header read(File file) throws IOException {
         try {
             final Jp2Header jp2Header = fromFile(file.getAbsolutePath());
             jp2Header.setFileName(file.getAbsolutePath());
             return jp2Header;
         } catch (IOException e) {
-            throw new FileNotFoundException("Failed to open file at: " + file.getAbsolutePath());
+            if (!file.exists()) {
+                throw new FileNotFoundException("Failed to open file at: " + file.getAbsolutePath());
+            } else {
+                throw e;
+            }
         }
     }
 
